@@ -14,9 +14,11 @@ Use this script to suggest DPI scale configuration to your WSL environment.
 Run the following script, and see the result:
 
 ```bash
-wget https://raw.githubusercontent.com/A-Ribeiro/wsl-hidpi-suggestion/main/run.sh
-chmod +x ./run.sh
-./run.sh
+curl -o- https://raw.githubusercontent.com/A-Ribeiro/wsl-hidpi-suggestion/main/run.sh | xargs -0 -o bash -c
+```
+
+```bash
+wget -qO- https://raw.githubusercontent.com/A-Ribeiro/wsl-hidpi-suggestion/main/run.sh | xargs -0 -o bash -c
 ```
 
 ## Authors
