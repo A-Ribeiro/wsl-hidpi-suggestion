@@ -21,6 +21,35 @@ curl -o- https://raw.githubusercontent.com/A-Ribeiro/wsl-hidpi-suggestion/main/r
 wget -qO- https://raw.githubusercontent.com/A-Ribeiro/wsl-hidpi-suggestion/main/run.sh | xargs -0 -o bash -c
 ```
 
+## Result
+
+```
+1) DPI 100%
+2) DPI 125%
+3) DPI 150%
+4) DPI 175%
+5) DPI 200%
+Select the zoom you want to apply: 1
+
+# wsl-hidpi-suggestion
+# 
+# Variable suggestion to use in the following files:
+#   ~/.bashrc
+#   /etc/profile
+# 
+# DPI scale info:
+#  - Main size
+#      (px): 2560x1600
+#      (mm): 344x215
+#      (DPI-100%): 189.023257 DPI
+#  - Scale set to: 1.968992
+# 
+export GDK_SCALE=1.968992
+export GDK_DPI_SCALE=1.968992
+export GTK_SCALE=1.968992
+export QT_SCALE_FACTOR=1.968992
+```
+
 ## Authors
 
 ***Alessandro Ribeiro da Silva*** obtained his Bachelor's degree in Computer Science from Pontifical Catholic 
