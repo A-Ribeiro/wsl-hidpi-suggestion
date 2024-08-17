@@ -5,7 +5,7 @@ but may have eternal life.
   \
 John 3:16
 
-## WSL Hidpi Suggestion Script
+## WSL Hi-DPI Suggestion Script
 
 Use this script to suggest DPI scale configuration to your WSL environment.
 
