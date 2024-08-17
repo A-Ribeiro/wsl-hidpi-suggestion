@@ -9,7 +9,7 @@ John 3:16
 
 Use this script to suggest DPI scale configuration to your WSL environment.
 
-# Dependency
+## Dependency
 
 ```bash
 sudo apt install bc
