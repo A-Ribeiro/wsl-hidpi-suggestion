@@ -37,7 +37,7 @@ print_dpi_scale() {
 
     percent_str=`python3 -c "print('%.0f' % round($1 * 100))"`
 
-    dpi_custom_percent=`python3 -c "print('%.6f' % round($dpi_100_percent * $1, 6))"`
+    dpi_custom_percent=`python3 -c "print('%.6f' % round($dpi_100_percent / $1, 6))"`
     dpi_scale_custom=`python3 -c "print('%.6f' % round($dpi_scale * $1, 6))"`
 
     echo "#      (DPI-$percent_str%): ${dpi_custom_percent} DPI"
