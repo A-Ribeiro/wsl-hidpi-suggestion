@@ -39,7 +39,7 @@ print_dpi_scale() {
     percent_str=(`echo $percent_str | tr '.' '\n'`)
     percent_str=${percent_str[0]}
 
-    dpi_custom_percent=$(bc <<<"scale=6; $dpi_100_percent / $1")
+    dpi_custom_percent=$(bc <<<"scale=6; $dpi_100_percent * $1")
     dpi_scale_custom=$(bc <<<"scale=6; $dpi_scale * $1 ")
 
     echo "#      (DPI-$percent_str%): ${dpi_custom_percent} DPI"
