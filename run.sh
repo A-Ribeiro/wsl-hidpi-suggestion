@@ -35,12 +35,10 @@ echo "$w,$h,$wm,$hm"
 print_dpi_scale() {
     local percent_str dpi_custom_percent dpi_scale_custom
 
-    percent_str=$(bc <<<"scale=0; $1 * 100")
-    percent_str=(`echo $percent_str | tr '.' '\n'`)
-    percent_str=${percent_str[0]}
+    percent_str=`python3 -c "print('%.0f' % round($1 * 100))"`
 
-    dpi_custom_percent=$(bc <<<"scale=6; $dpi_100_percent * $1")
-    dpi_scale_custom=$(bc <<<"scale=6; $dpi_scale * $1 ")
+    dpi_custom_percent=`python3 -c "print('%.6f' % round($dpi_100_percent * $1, 6))"`
+    dpi_scale_custom=`python3 -c "print('%.6f' % round($dpi_scale * $1, 6))"`
 
     echo "#      (DPI-$percent_str%): ${dpi_custom_percent} DPI"
     echo "#  - Scale set to: $dpi_scale_custom"
@@ -67,8 +65,8 @@ dpi_scale_suggestion() {
     h=${array[1]} # height in px
     wm=${array[2]} # width in mm
     hm=${array[3]} # height in mm
-    dpi_100_percent=$(bc <<<"scale=6; $w / ($wm / 25.4)")
-    dpi_scale=$(bc <<<"scale=6; ($w * 25.4) / ($wm * 96) ")
+    dpi_100_percent=`python3 -c "print('%f' % ($w / ($wm / 25.4)) )"`
+    dpi_scale=`python3 -c "print('%f' % (($w * 25.4) / ($wm * 96)) )"`
 
     zoom=1.0
     PS3='Select the zoom you want to apply: '
