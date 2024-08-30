@@ -105,32 +105,31 @@ dpi_scale_suggestion() {
     echo "export QT_SCALE_FACTOR=${dpi_scale_custom}"
     echo ""
 
+    echo "creating ~/.wsl-hidpi-suggestion"
+    echo "# wsl-hidpi-suggestion" > ~/.wsl-hidpi-suggestion
+    echo "# " >> ~/.wsl-hidpi-suggestion
+    echo "# Variable suggestion to use in the following files:" >> ~/.wsl-hidpi-suggestion
+    echo "#   ~/.bashrc" >> ~/.wsl-hidpi-suggestion
+    echo "#   /etc/profile" >> ~/.wsl-hidpi-suggestion
+    echo "# " >> ~/.wsl-hidpi-suggestion
+    echo "# DPI scale info:" >> ~/.wsl-hidpi-suggestion
+    echo "#  - Main size" >> ~/.wsl-hidpi-suggestion
+    echo "#      (px): ${w}x${h}" >> ~/.wsl-hidpi-suggestion
+    echo "#      (mm): ${wm}x${hm}" >> ~/.wsl-hidpi-suggestion
+    echo "#      (DPI-$percent_str%): ${dpi_custom_percent} DPI" >> ~/.wsl-hidpi-suggestion
+    echo "#  - Scale set to: $dpi_scale_custom" >> ~/.wsl-hidpi-suggestion
+    echo "# " >> ~/.wsl-hidpi-suggestion
+    echo "export GDK_SCALE=${dpi_scale_custom}" >> ~/.wsl-hidpi-suggestion
+    echo "export GDK_DPI_SCALE=${dpi_scale_custom}" >> ~/.wsl-hidpi-suggestion
+    echo "export GTK_SCALE=${dpi_scale_custom}" >> ~/.wsl-hidpi-suggestion
+    echo "export QT_SCALE_FACTOR=${dpi_scale_custom}" >> ~/.wsl-hidpi-suggestion
+    echo ""
+
 while true; do
     read -p "Do you want to add changes to ~./bashrc? (yes/no) " yn
     case $yn in
         [Yy]* ) 
             echo ""
-            echo "creating ~/.wsl-hidpi-suggestion"
-            
-            echo "# wsl-hidpi-suggestion" > ~/.wsl-hidpi-suggestion
-            echo "# " >> ~/.wsl-hidpi-suggestion
-            echo "# Variable suggestion to use in the following files:" >> ~/.wsl-hidpi-suggestion
-            echo "#   ~/.bashrc" >> ~/.wsl-hidpi-suggestion
-            echo "#   /etc/profile" >> ~/.wsl-hidpi-suggestion
-            echo "# " >> ~/.wsl-hidpi-suggestion
-            echo "# DPI scale info:" >> ~/.wsl-hidpi-suggestion
-            echo "#  - Main size" >> ~/.wsl-hidpi-suggestion
-            echo "#      (px): ${w}x${h}" >> ~/.wsl-hidpi-suggestion
-            echo "#      (mm): ${wm}x${hm}" >> ~/.wsl-hidpi-suggestion
-            echo "#      (DPI-$percent_str%): ${dpi_custom_percent} DPI" >> ~/.wsl-hidpi-suggestion
-            echo "#  - Scale set to: $dpi_scale_custom" >> ~/.wsl-hidpi-suggestion
-            echo "# " >> ~/.wsl-hidpi-suggestion
-            echo "export GDK_SCALE=${dpi_scale_custom}" >> ~/.wsl-hidpi-suggestion
-            echo "export GDK_DPI_SCALE=${dpi_scale_custom}" >> ~/.wsl-hidpi-suggestion
-            echo "export GTK_SCALE=${dpi_scale_custom}" >> ~/.wsl-hidpi-suggestion
-            echo "export QT_SCALE_FACTOR=${dpi_scale_custom}" >> ~/.wsl-hidpi-suggestion
-
-
             echo "adding '. ~/.wsl-hidpi-suggestion' to ~/.bashrc"
             if `grep -Fxq ". ~/.wsl-hidpi-suggestion" ~/.bashrc`
             then
