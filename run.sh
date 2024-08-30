@@ -161,4 +161,5 @@ if [[ -d /mnt/wslg/runtime-dir ]] ; then
     dpi_scale_suggestion
 else
     echo 'ERROR: Not a WSL Environment'
+    exit 1
 fi
