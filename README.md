@@ -48,6 +48,13 @@ export GDK_SCALE=1.968992
 export GDK_DPI_SCALE=1.968992
 export GTK_SCALE=1.968992
 export QT_SCALE_FACTOR=1.968992
+
+creating ~/.wsl-hidpi-suggestion
+
+Do you want to add changes to ~./bashrc? (yes/no) y
+
+adding '. ~/.wsl-hidpi-suggestion' to ~/.bashrc
+ - adding entry to ~/.bashrc
 ```
 
 ## Authors
