@@ -136,7 +136,7 @@ while true; do
                 echo " - entry already added to ~/.bashrc"
             else
                 echo " - adding entry to ~/.bashrc"
-                echo ". ~/.wsl-hidpi-suggestion" >> ~/.bashrc
+                echo -e "\n. ~/.wsl-hidpi-suggestion" >> ~/.bashrc
             fi
 
             break
