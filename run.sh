@@ -2,34 +2,224 @@
 
 powershell_script='
 Add-Type @"
-using System;
 using System.Runtime.InteropServices;
+using System;
+using System.Globalization;
+
+[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+public struct DEVMODEA
+{
+    public const int DMDO_DEFAULT = 0;
+    public const int DMDO_D90 = 1;
+    public const int DMDO_D180 = 2;
+    public const int DMDO_D270 = 3;
+
+    public const int DM_PELSWIDTH = 0x80000;
+    public const int DM_PELSHEIGHT = 0x100000;
+    private const int CCHDEVICENAME = 32;
+    private const int CCHFORMNAME = 32;
+
+    [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CCHDEVICENAME)]
+    public string dmDeviceName;
+    public short dmSpecVersion;
+    public short dmDriverVersion;
+    public short dmSize;
+    public short dmDriverExtra;
+    public int dmFields;
+
+    public int dmPositionX;
+    public int dmPositionY;
+    public int dmDisplayOrientation; // DMDO
+    public int dmDisplayFixedOutput;
+
+    public short dmColor;
+    public short dmDuplex;
+    public short dmYResolution;
+    public short dmTTOption;
+    public short dmCollate;
+    [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CCHFORMNAME)]
+    public string dmFormName;
+    public short dmLogPixels;
+    public int dmBitsPerPel;
+    public int dmPelsWidth;
+    public int dmPelsHeight;
+    public int dmDisplayFlags;
+    public int dmDisplayFrequency;
+    public int dmICMMethod;
+    public int dmICMIntent;
+    public int dmMediaType;
+    public int dmDitherType;
+    public int dmReserved1;
+    public int dmReserved2;
+    public int dmPanningWidth;
+    public int dmPanningHeight;
+}
+
 public class DCOps {
+
     [DllImport("user32.dll")] public static extern IntPtr GetDC(IntPtr hwnd);
     [DllImport("user32.dll")] public static extern int ReleaseDC(IntPtr hwnd, IntPtr hdc);
     [DllImport("gdi32.dll")] public static extern int GetDeviceCaps(IntPtr hdc, int nIndex);
 
-    public static int HORZSIZE = 4;
-    public static int VERTSIZE = 6;
-    public static int DESKTOPVERTRES = 117;
-    public static int DESKTOPHORZRES = 118;
+    public const int HORZRES = 8;
+    public const int VERTRES = 10;
+    public const int HORZSIZE = 4;
+    public const int VERTSIZE = 6;
+    public const int DESKTOPVERTRES = 117;
+    public const int DESKTOPHORZRES = 118;
+    public const int LOGPIXELSX = 88;
+    public const int LOGPIXELSY = 90;
+
+    [DllImport("user32.dll", CharSet = CharSet.Ansi, SetLastError = true)]
+    public static extern bool EnumDisplaySettingsA(string deviceName, int modeNum, ref DEVMODEA devMode);
+
+    public const int ENUM_CURRENT_SETTINGS = -1;
+
+    public static string mainDisplay = "\\\\.\\DISPLAY1";
+
+    [DllImport("kernel32.dll")]
+    static extern IntPtr GetCurrentProcess();
+
+    [DllImport("shcore.dll")]
+    static extern int GetProcessDpiAwareness(IntPtr hprocess, out int lpdpiAwareness);
+    [DllImport("shcore.dll")]
+    static extern int SetProcessDpiAwareness(int value);
+
+    public const int PROCESS_DPI_UNAWARE = 0;
+    public const int PROCESS_SYSTEM_DPI_AWARE = 1;
+    public const int PROCESS_PER_MONITOR_DPI_AWARE = 2;
+
+    
+    [DllImport("Shcore.dll")]
+    static extern int GetDpiForMonitor(IntPtr hmonitor, uint dpiType, out uint dpiX, out uint dpiY);
+
+    public const uint MDT_EFFECTIVE_DPI = 0;
+    public const uint MDT_ANGULAR_DPI = 1;
+    public const uint MDT_RAW_DPI = 2;
+
+    [DllImport("user32.dll")]
+    static extern IntPtr MonitorFromWindow(IntPtr hwnd, uint dwFlags);
+
+    public const uint MONITOR_DEFAULTTONULL       = 0;
+    public const uint MONITOR_DEFAULTTOPRIMARY    = 1;
+    public const uint MONITOR_DEFAULTTONEAREST    = 2;
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    public struct RECT
+    {
+        public int left;
+        public int top;
+        public int right;
+        public int bottom;
+    }
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    public struct MONITORINFOEXA
+    {
+        public uint cbSize;
+        public RECT rcMonitor;
+        public RECT rcWork;
+        public uint dwFlags;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
+        public string deviceName;
+    }
+
+    [DllImport("user32.dll")]
+    static extern bool GetMonitorInfoA(IntPtr hmonitor, ref MONITORINFOEXA lpmi);
+
+
+    [DllImport("user32.dll")]
+    static extern IntPtr GetDesktopWindow();
+
+    public static void run() {
+        SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
+
+        var hwnd = GetDesktopWindow();
+
+        var hdc = GetDC(hwnd);
+        if (hdc == IntPtr.Zero){
+            Console.WriteLine("1,1,1,1,1,DPI 100%");
+            return;
+        }
+
+        var hmonitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTOPRIMARY);
+        if (hmonitor == IntPtr.Zero){
+            Console.WriteLine("2,2,2,2,1,DPI 100%");
+            ReleaseDC(hwnd, hdc);
+            return;
+        }
+
+        var mi = new MONITORINFOEXA();
+        mi.cbSize = (uint)Marshal.SizeOf(typeof(MONITORINFOEXA));
+
+        if (!GetMonitorInfoA(hmonitor, ref mi)){
+            Console.WriteLine("3,3,3,3,1,DPI 100%");
+            ReleaseDC(hwnd, hdc);
+            return;
+        }
+
+        var devMode = new DEVMODEA();
+        devMode.dmSize = (short)Marshal.SizeOf(typeof(DEVMODEA));
+
+        if (!EnumDisplaySettingsA(mi.deviceName, ENUM_CURRENT_SETTINGS, ref devMode)){
+            Console.WriteLine("4,4,4,4,1,DPI 100%");
+            ReleaseDC(hwnd, hdc);
+            return;
+        }
+
+        //var w=GetDeviceCaps(hdc, DESKTOPHORZRES);
+        //var h=GetDeviceCaps(hdc, DESKTOPVERTRES);
+        
+        var w = devMode.dmPelsWidth;
+        var h = devMode.dmPelsHeight;
+
+        var wm = GetDeviceCaps(hdc, HORZSIZE);
+        var hm = GetDeviceCaps(hdc, VERTSIZE);
+
+        var width_virtual_pixels = GetDeviceCaps(hdc, HORZRES);
+        var height_virtual_pixels = GetDeviceCaps(hdc, VERTRES);
+
+        var scaleFactor = ((double)w / (double)(width_virtual_pixels)+
+							(double)h / (double)(height_virtual_pixels)) * 0.5;
+        scaleFactor = Math.Round(scaleFactor * 100.0) / 100.0;
+
+        int processDpiAwareness;
+        if (GetProcessDpiAwareness(GetCurrentProcess(), out processDpiAwareness) >= 0) {
+            if (processDpiAwareness == PROCESS_PER_MONITOR_DPI_AWARE) {
+                uint dpiX, dpiY;
+                if (GetDpiForMonitor(hmonitor, MDT_EFFECTIVE_DPI, out dpiX, out dpiY) >= 0)
+                {
+                    double scale_x = (double)dpiX;
+                    double scale_y = (double)dpiY;
+                    double scale = (scale_x + scale_y) * 0.5;
+                    scale = Math.Round(scale);
+                    scale = scale / 96.0;
+                    scaleFactor = scale;
+                }
+            } else if (processDpiAwareness == PROCESS_SYSTEM_DPI_AWARE) {
+                int dpiX = GetDeviceCaps(hdc, LOGPIXELSX);
+                int dpiY = GetDeviceCaps(hdc, LOGPIXELSY);
+                double scale_x = (double)dpiX;
+                double scale_y = (double)dpiY;
+                double scale = (scale_x + scale_y) * 0.5;
+                scale = Math.Round(scale);
+                scale = scale / 96.0;
+                scaleFactor = scale;
+            }
+        }
+
+        ReleaseDC(hwnd, hdc);
+
+        var dpi_str = String.Format(CultureInfo.InvariantCulture,"DPI {0}%", Math.Round( scaleFactor * 100.0 ) ) ;
+        Console.WriteLine(
+            String.Format(CultureInfo.InvariantCulture,"{0},{1},{2},{3},{4},{5}", w, h, wm, hm, scaleFactor, dpi_str)
+        );
+
+    }
 }
 "@
 
-$hdc = [DCOps]::GetDC([IntPtr]::Zero)
-if ($hdc -eq [IntPtr]::Zero){
-    echo "1,1,1,1"
-    exit
-}
-$w=[DCOps]::GetDeviceCaps($hdc, [DCOps]::DESKTOPHORZRES)
-$h=[DCOps]::GetDeviceCaps($hdc, [DCOps]::DESKTOPVERTRES)
-
-$wm=[DCOps]::GetDeviceCaps($hdc, [DCOps]::HORZSIZE)
-$hm=[DCOps]::GetDeviceCaps($hdc, [DCOps]::VERTSIZE)
-
-$rc=[DCOps]::ReleaseDC([IntPtr]::Zero, $hdc)
-
-echo "$w,$h,$wm,$hm"
+[DCOps]::run()
 '
 
 dpi_scale_suggestion() {
@@ -38,38 +228,62 @@ dpi_scale_suggestion() {
     # set -f # avoid globbing (expansion of *).
     # array=(${MainDisplayInfo//,/ })
     # array=(`echo $MainDisplayInfo | sed 's/,/\n/g'`)
-    array=(`echo $MainDisplayInfo | tr ',' '\n'`)
-    w=${array[0]} # width in px
-    h=${array[1]} # height in px
-    wm=${array[2]} # width in mm
-    hm=${array[3]} # height in mm
+    array=(`echo -e "$MainDisplayInfo" | tr ' ' '_' | tr ',' '\n'`)
+    
+    w=`echo -e "${array[0]}" | tr '_' ' ' | tr -d '\r\n'` # width in px
+    h=`echo -e "${array[1]}" | tr '_' ' ' | tr -d '\r\n'` # height in px
+    wm=`echo -e "${array[2]}" | tr '_' ' ' | tr -d '\r\n'` # width in mm
+    hm=`echo -e "${array[3]}" | tr '_' ' ' | tr -d '\r\n'` # height in mm
+    current_zoom=`echo -e "${array[4]}" | tr '_' ' ' | tr -d '\r\n'` # DPI scale
+    dpi_str=`echo -e "${array[5]}" | tr '_' ' ' | tr -d '\r\n'` # DPI str
+    
     dpi_100_percent=`python3 -c "print('%f' % ($w / ($wm / 25.4)) )"`
     dpi_scale=`python3 -c "print('%f' % (($w * 25.4) / ($wm * 96)) )"`
 
+    # echo "current zoom: $current_zoom"
+    # echo "DPI zoom: $dpi_str"
+
     zoom=1.0
-    PS3='Select the zoom you want to apply: '
-    options=("DPI 100%" "DPI 125%" "DPI 150%" "DPI 175%" "DPI 200%")
-    select opt in "${options[@]}"
+    PS3="Select the zoom you want to apply: "
+    options=("DPI 100%" "DPI 125%" "DPI 150%" "DPI 175%" "DPI 200%" "DPI 225%" "DPI 250%")
+    options2=()
+    for element in "${options[@]}"
     do
-        case $opt in
-            "DPI 100%")
+        if [[ "$element" == "$dpi_str" ]]; then
+            options2+=("[${element}]")
+        else
+            options2+=("$element")
+        fi
+    done
+    select opt in "${options2[@]}"
+    do
+        case $REPLY in
+            1)
                 zoom=1.0
                 break
                 ;;
-            "DPI 125%")
+            2)
                 zoom=1.25
                 break
                 ;;
-            "DPI 150%")
+            3)
                 zoom=1.5
                 break
                 ;;
-            "DPI 175%")
+            4)
                 zoom=1.75
                 break
                 ;;
-            "DPI 200%")
+            5)
                 zoom=2.0
+                break
+                ;;
+            6)
+                zoom=2.25
+                break
+                ;;
+            7)
+                zoom=2.5
                 break
                 ;;
             *) echo "invalid option $REPLY";;

@@ -24,11 +24,13 @@ Run the following script, and see the result:
 ## Result
 
 ```
-1) DPI 100%
+1) [DPI 100%]
 2) DPI 125%
 3) DPI 150%
 4) DPI 175%
 5) DPI 200%
+6) DPI 225%
+7) DPI 250%
 Select the zoom you want to apply: 1
 
 # wsl-hidpi-suggestion
