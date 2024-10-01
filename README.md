@@ -53,7 +53,7 @@ export QT_SCALE_FACTOR=1.968992
 
 creating ~/.wsl-hidpi-suggestion
 
-Do you want to add changes to ~./bashrc? (yes/no) y
+Do you want to add changes to ~/.bashrc? (yes/no) y
 
 adding '. ~/.wsl-hidpi-suggestion' to ~/.bashrc
  - adding entry to ~/.bashrc

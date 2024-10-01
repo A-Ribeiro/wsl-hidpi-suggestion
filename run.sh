@@ -340,7 +340,7 @@ dpi_scale_suggestion() {
     echo ""
 
 while true; do
-    read -p "Do you want to add changes to ~./bashrc? (yes/no) " yn
+    read -p "Do you want to add changes to ~/.bashrc? (yes/no) " yn
     case $yn in
         [Yy]* ) 
             echo ""
