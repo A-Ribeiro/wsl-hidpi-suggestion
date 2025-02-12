@@ -61,7 +61,7 @@ adding '. ~/.wsl-hidpi-suggestion' to ~/.bashrc
 
 ## Authors
 
-***Alessandro Ribeiro da Silva*** obtained his Bachelor's degree in Computer Science from Pontifical Catholic 
+***Alessandro Ribeiro*** obtained his Bachelor's degree in Computer Science from Pontifical Catholic 
 University of Minas Gerais and a Master's degree in Computer Science from the Federal University of Minas Gerais, 
 in 2005 and 2008 respectively. He taught at PUC and UFMG as a substitute/assistant professor in the courses 
 of Digital Arts, Computer Science, Computer Engineering and Digital Games. He have work experience with interactive
